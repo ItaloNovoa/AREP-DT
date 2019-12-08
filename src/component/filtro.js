@@ -20,32 +20,30 @@ import MenuItem from '@material-ui/core/MenuItem';
 class filtro extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { items: [], name: '', status: '', dueDate: new Date(), back:false };
+        this.state = { items: [], cedula: '',  back:false };
         this.handleChange = this.handleChange.bind(this);
-        this.handleStatus = this.handleStatus.bind(this);
-        this.handleDate = this.handleDate.bind(this);
         this.handleBack = this.handleBack.bind(this);        
         this.handleSearch= this.handleSearch.bind(this);
         this.avoid=this.avoid.bind(this);
         this.lista=[];           
     }
     updateList() {
-        fetch('https://taskplannerback.herokuapp.com/api/Task')
-          .then(response => response.json())
-          .then(data => {
-            let tasksList = [];
-            data.forEach(function (task) {
-              tasksList.push({
-                id: task.id,
-                description: task.description,
-                status: task.state,
-                priority: task.priority,
-                dueDate: task.dueDate,
-                propietario: task.propietario
-              })
-    
-            });
-            this.lista= tasksList ;
+        fetch('http://localhost:8080/Carta')
+            .then(response => response.json())
+            .then(data => {
+                let cardList = [];
+                data.forEach(function (card) {
+                    cardList.push({
+                        id: card.cedula,
+                        compañia: card.compañia,
+                        nombre: card.nombre,
+                        dueDate: card.fechaDespido,
+                        description: card.descripcion,
+                        puntuacion: card.puntuacion
+                    })
+
+                });
+                this.lista= cardList ;            
           });
       }
       componentDidMount() {
@@ -69,20 +67,6 @@ class filtro extends React.Component {
                 right: theme.spacing(5),
             },
         }));
-        const estados = [
-            {
-              value: 'In review',
-              label: 'In review',
-            },
-            {
-              value: 'In progress',
-              label: 'In progress',
-            },
-            {
-              value: 'Terminated',
-              label: 'Terminated',
-            },
-          ];
         
         if (this.state.back) {
             return <Redirect to={{
@@ -92,55 +76,18 @@ class filtro extends React.Component {
         };
         return (
             <div>
-                <h2>Lista de tarjetas</h2>
-
-                
-            <TodoList items={this.state.items} /> 
-
-
                 <Card >
                     <h2>Datos buscar tarjetas</h2>
                     <form onSubmit={this.handleSubmit}>
-                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                            <KeyboardDatePicker
-                                margin="normal"
-                                id="date"
-                                label="fecha buscada"
-                                format="MM/dd/yyyy"
-                                value={this.state.dueDate}
-                                selected={this.state.dueDate}
-                                onChange={this.handleDate}
-                                KeyboardButtonProps={{
-                                    'aria-label': 'change date',
-                                }}
-                            />
-                        </MuiPickersUtilsProvider>
                         <TextField
                             required
                             type="text"
-                            label="name"
-                            id="name"
-                            value={this.state.name}
+                            label="cedula"
+                            id="cedula"
+                            value={this.state.cedula}
                             onChange={this.handleChange}
                             margin="normal"
                         />
-                        <TextField
-                            select
-                            id="status"
-                            label="Status"
-                            value={this.state.status}
-                            onChange={this.handleStatus}
-                            margin="normal"
-                            InputProps={{
-                                startAdornment: <InputAdornment position="start">Status</InputAdornment>,
-                            }}
-                        >
-                            {estados.map(option => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
 
                         <Container>
                             <Fab tooltip="filtrar" color="primary" aria-label="add" onClick={this.handleSearch} className={useStyles.fab1}>
@@ -156,6 +103,8 @@ class filtro extends React.Component {
 
                         </Container>
                     </form>
+                    <h2>Lista de tarjetas</h2>
+                        <TodoList items={this.state.items} /> 
                 </Card >
             </div>
 
@@ -163,19 +112,14 @@ class filtro extends React.Component {
         );
     }
     handleChange(e) {
-        this.setState({ name: document.getElementById('name').value });
+        this.setState({ cedula: document.getElementById('cedula').value });
     }
 
 
-    handleDate(e) {
-        this.setState({ dueDate: e });
-    }
+   
     handleBack(event){
         this.setState({ back: true });
     }
-    handleStatus(e) {
-        this.setState({ status: e.target.value});
-      };
     avoid(event){
         
     }
@@ -183,15 +127,15 @@ class filtro extends React.Component {
         this.state.items=[]
         var a =false;
         for (var i=0; i < this.lista.length; i++) {
-            if(this.igualarFechas(this.lista[i].dueDate,this.state.dueDate) && this.lista[i].propietario.name===this.state.name  && this.lista[i].status===this.state.status){
+            if(this.lista[i].id===this.state.cedula){
                 a=true;
                 const newItem = {
-                    description: this.lista[i].description,
-                    name: this.lista[i].name,
-                    priority: this.lista[i].priority,
-                    status: this.lista[i].status,
+                    id: this.lista[i].id,
+                    compañia: this.lista[i].compañia,
+                    nombre: this.lista[i].nombre,
                     dueDate: this.lista[i].dueDate,
-                    propietario: this.lista[i].propietario,
+                    description: this.lista[i].description,
+                    puntuacion: this.lista[i].puntuacion
                   }; 
                 this.setState(prevState => ({
                     items: prevState.items.concat(newItem),
@@ -202,17 +146,6 @@ class filtro extends React.Component {
         if(!a){
             alert("No hay cartas con estos valores");
         }
-    }
-
-    igualarFechas(a,b){
-        if(new Date(a).getDate===b.getDate){
-            if(new Date(a).getMonth===b.getMonth){
-                if(new Date(a).getFullYear===b.getFullYear){
-                    return true;
-                }
-            }                
-        }
-        return false;
-    }
+    }    
 }
 export default filtro;

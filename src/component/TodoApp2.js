@@ -14,14 +14,18 @@ export class TodoApp2 extends React.Component {
                 <p></p>
                 <p></p>
                 <Card style={{flex:1, backgroundColor:'#92a8d1'}} >
+                <Typography color="textSecondary" gutterBottom>
+                        Cedula= {this.props.res.id} {"                  -          ".replace(/ /g, "\u00a0")} Nombre= {this.props.res.nombre}
+                    </Typography>
+                    <Typography color="textSecondary" gutterBottom>
+                        Empresa= {this.props.res.compañia}{"                  -          ".replace(/ /g, "\u00a0")} puntuacion= {this.props.res.puntuacion}
+                    </Typography>
                     <Typography color="textSecondary" gutterBottom>
                         Descripcion= {this.props.res.description}
                     </Typography>
+                    
                     <Typography color="textSecondary" gutterBottom>
-                        Nombre= {this.props.res.propietario.name} {"                  -          ".replace(/ /g, "\u00a0")} priority= {this.props.res.priority}
-                    </Typography>
-                    <Typography color="textSecondary" gutterBottom>
-                        Estado = {this.props.res.status}  {"           -          ".replace(/ /g, "\u00a0")}    DueDate = {this.props.res.dueDate.toString()}
+                        DueDate = {this.props.res.dueDate.toString()}
                     </Typography>
                 </Card>
                 <p></p>

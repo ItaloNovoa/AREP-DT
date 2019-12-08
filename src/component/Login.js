@@ -20,23 +20,17 @@ export class Login extends React.Component {
             email : email,
             password : password
         }
-        axios.post('https://taskplannerback.herokuapp.com/api/login', newItem)
+        axios.get('http://localhost:8080/Company/'+newItem.email+"/"+newItem.password)
             .then(function (response) {
-                localStorage.setItem("Token", response.data.accessToken);
                 localStorage.setItem("isLoggedin", true);
-                localStorage.setItem("mailLogged", email);
+                localStorage.setItem("nameLogged", email);
 
                 window.location.replace("/miniDrawer");   
             })
             .catch(function (error) {
                 alert("usuario o correo incorrecto");
-            })       
+            })     
         
-        this.axios = axios.create({
-            baseURL: 'https://taskplannerback.herokuapp.com/api',
-            timeout: 1000,
-            headers: {'Authorization': 'Bearer '+localStorage.getItem("Token")}
-        });
 
     }
     constructor(props) {
@@ -83,7 +77,7 @@ export class Login extends React.Component {
                         
                         <form className="form">
                             <FormControl margin="normal" fullWidth>
-                                <InputLabel htmlFor="email">Email Address</InputLabel>
+                                <InputLabel htmlFor="email">nombre compañia</InputLabel>
                                 <Input id="email" name="email" autoComplete="email" autoFocus />
                             </FormControl>
                             <FormControl margin="normal" fullWidth>

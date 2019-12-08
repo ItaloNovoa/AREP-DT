@@ -13,26 +13,33 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Container } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import axios from 'axios';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import MenuItem from '@material-ui/core/MenuItem';
 
 
 export class Name extends Component {
     
     checkdata() {
-        const email = document.getElementById("email").value;
-        const name = document.getElementById("name").value;
-        const lastName = document.getElementById("last_name").value;
-        const password = document.getElementById("password").value
+        const tipoEmpresa = document.getElementById("email").value;
+        const RUT = document.getElementById("name").value;
+        const nombreEmpresa = document.getElementById("last_name").value;
+        const password = document.getElementById("password").value;
+        const registro =this.state.birthday;
+        const tipo =this.state.email;
 
         const newItem = {
-            name: name+" "+lastName,
-            email: email,
-            password: password,
+            rut: RUT,
+            nameCompany: nombreEmpresa,
+            fechaResgistro: registro,
+            tipoEmpresa: tipo,
+            password: password
         };
-        axios.post('https://taskplannerback.herokuapp.com/api/User',newItem).then(res=>{
-            if (email !== "" && password !== "") {            
+        console.log(JSON.stringify(newItem));
+        alert(JSON.stringify(newItem));
+        axios.post('http://localhost:8080/Company',newItem).then(res=>{
+            if (nombreEmpresa !== "" && password !== "") {            
                 localStorage.setItem("isLoggedin", true);
-                localStorage.setItem("nameLogged",name+" "+lastName);
-                localStorage.setItem("mailLogged", email);
+                localStorage.setItem("nameLogged",nombreEmpresa);
                 this.setState({ Loggin: true });            
             }
         });
@@ -104,6 +111,18 @@ export class Name extends Component {
     }
 
     render() {
+
+        const estados = [
+            {
+              value: 'Privada',
+              label: 'Privada',
+            },
+            {
+              value: 'Publica',
+              label: 'Publica',
+            }
+          ];
+
         const divStyle = {
             display: 'flex',
             flexDirection: 'column',
@@ -146,7 +165,7 @@ export class Name extends Component {
                     <form style={divStyle} >
                         <TextField
                             type="text"
-                            label="FIRST NAME"
+                            label="RUT"
                             id="name"
                             value={this.state.first_name}
                             onChange={this.handleFirstName}
@@ -154,26 +173,35 @@ export class Name extends Component {
                         />
                         <TextField
                             type="text"
-                            label="LAST NAME"
+                            label="nombre de la compañia"
                             id="last_name"
                             value={this.state.last_name}
                             onChange={this.handleLastName}
                             margin="normal"
                         />
                         <TextField
+                            select
                             type="email"
-                            label="EMAIL ADDRESS"
+                            label="Tipo Empresa"
                             id="email"
                             value={this.state.email}
                             onChange={this.handleEmail}
                             margin="normal"
-                        />
+                            InputProps={{
+                                startAdornment: <InputAdornment position="start">Tipo</InputAdornment>,
+                              }}
+                        >{estados.map(option => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </TextField>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
 
                             <KeyboardDatePicker
                                 margin="normal"
                                 id="birthday"
-                                label="Bird date"
+                                label="fecha Registro"
                                 format="MM/dd/yyyy"
                                 value={this.state.birthday}
                                 selected={this.state.birthday}

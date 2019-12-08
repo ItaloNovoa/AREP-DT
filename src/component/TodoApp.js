@@ -23,43 +23,34 @@ class TodoApp extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { items: [], description: '', priority: 0, status: '', filtrob: false, dueDate: new Date() };
+    this.state = { items: [], id: '', nombre: '',description:'',puntuacion:'', filtrob: false,dueDate:new Date().getDate()};
     this.handleChange = this.handleChange.bind(this);
-    this.handleDate = this.handleDate.bind(this);
-    this.handleStatus=this.handleStatus.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
   }
   updateList() {
-    fetch('https://taskplannerback.herokuapp.com/api/Task')
+    fetch('http://localhost:8080/Carta')
       .then(response => response.json())
       .then(data => {
-        let tasksList = [];
-        data.forEach(function (task) {
-          tasksList.push({
-            id: task.id,
-            description: task.description,
-            status: task.state,
-            priority: task.priority,
-            dueDate: task.dueDate,
-            propietario: task.propietario
+        let cardList = [];
+        data.forEach(function (card) {
+          cardList.push({
+            id: card.cedula,
+            compañia: card.compañia,
+            nombre: card.nombre,
+            dueDate: card.fechaDespido,
+            description: card.descripcion,
+            puntuacion: card.puntuacion
           })
 
         });
-        this.setState({ items: tasksList });
+        this.setState({ items: cardList });
       });
-  }
-  getId(){
-    axios.get('https://taskplannerback.herokuapp.com/api/CUser/'+localStorage.getItem("mailLogged"))
-      .then(res => {
-        localStorage.setItem("nameLogged",res.data.name);
-      })
   }   
   
 
   componentDidMount() {
     this.updateList();
-    this.getId();
   }
 
   checkdata(items) {
@@ -72,20 +63,7 @@ class TodoApp extends React.Component {
 
   render() {
     
-    const estados = [
-      {
-        value: 'In review',
-        label: 'In review',
-      },
-      {
-        value: 'In progress',
-        label: 'In progress',
-      },
-      {
-        value: 'Terminated',
-        label: 'Terminated',
-      },
-    ];
+    
 
     const useStyles = makeStyles(theme => ({
       root: {
@@ -113,6 +91,30 @@ class TodoApp extends React.Component {
         <Card >
           <h2>Datos nuevo Despido</h2>
           <form onSubmit={this.handleSubmit}>
+          <TextField
+              type="text"
+              label="cedula"
+              id="cedula"
+              value={this.state.id}
+              onChange={this.handleChange}
+              margin="normal"
+            />
+            <TextField
+              type="text"
+              label="nombre"
+              id="nombre"
+              value={this.state.nombre}
+              onChange={this.handleChange}
+              margin="normal"
+            />
+            <TextField
+              type="number"
+              label="puntuacion"
+              id="puntuacion"
+              value={this.state.puntuacion}
+              onChange={this.handleChange}
+              margin="normal"
+            />
             <TextField
               type="text"
               label="Descripcion"
@@ -120,48 +122,7 @@ class TodoApp extends React.Component {
               value={this.state.description}
               onChange={this.handleChange}
               margin="normal"
-            />
-            <TextField
-              type="number"
-              label="priority"
-              id="priority"
-              value={this.state.priority}
-              onChange={this.handleChange}
-              margin="normal"
-            />
-            <TextField
-              select
-              id="status"
-              label="Status"
-              value= {this.state.status}
-              onChange={this.handleStatus}
-              margin="normal"
-              InputProps={{
-                startAdornment: <InputAdornment position="start">Status</InputAdornment>,
-              }}
-            >
-              {estados.map(option => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-
-              <KeyboardDatePicker
-                margin="normal"
-                id="date"
-                label="Date"
-                format="MM/dd/yyyy"
-                value={this.state.dueDate}
-                selected={this.state.dueDate}
-                onChange={this.handleDate}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
-            </MuiPickersUtilsProvider>
+            />            
             <Container>
               <Fab tooltip="Buscar Empleado en base general" color="primary" aria-label="add" onClick={this.handleSearch} className={useStyles.fab1}>
                 <SearchIcon />
@@ -188,30 +149,25 @@ class TodoApp extends React.Component {
 
 
   handleChange(e) {
+    this.setState({ id: document.getElementById('cedula').value })
     this.setState({ description: document.getElementById('description').value })
-    this.setState({ priority: document.getElementById('priority').value });;
+    this.setState({ nombre: document.getElementById('nombre').value });;
+    this.setState({ puntuacion: document.getElementById('puntuacion').value })
   }
 
 
-  handleDate(e) {
-    this.setState({ dueDate: e });
-  }
-
-  handleStatus(e) {
-    this.setState({ status: e.target.value});
-  };
 
   handleSubmit(e) {
     e.preventDefault();
     const newItem = {
-      description: this.state.description,
-      priority: this.state.priority,
-      dueDate: this.state.dueDate,
-      state: this.state.status,
-      id: uuid(),
-      propietario: {id:2,name:localStorage.getItem("nameLogged"), email:localStorage.getItem("mailLogged"), },
+      cedula: this.state.id,
+      compañia: localStorage.getItem('nameLogged'),
+      nombre: this.state.nombre,
+      fechaDespido: this.state.dueDate,
+      descripcion: this.state.description,
+      puntuacion: this.state.puntuacion,
     };
-    axios.post('https://taskplannerback.herokuapp.com/api/Task',newItem).then(res=>{
+    axios.post('http://localhost:8080/Carta',newItem).then(res=>{
     this.updateList();
     });
   }
